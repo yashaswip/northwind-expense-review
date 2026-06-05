@@ -1,0 +1,38 @@
+{
+  "line_items": [
+    {
+      "submission_folder": "01_clean_denver",
+      "receipt_filename": "04_dinner_mercantile.pdf",
+      "expected_verdict": "compliant",
+      "expected_doc_ids": ["TEP-002"]
+    },
+    {
+      "submission_folder": "03_dinner_over_cap",
+      "receipt_filename": "04_dinner_alinea.pdf",
+      "expected_verdict": "flagged",
+      "expected_doc_ids": ["TEP-002"]
+    },
+    {
+      "submission_folder": "04_alcohol_solo_travel",
+      "receipt_filename": "05_dinner_franklin.pdf",
+      "expected_verdict": "rejected",
+      "expected_doc_ids": ["TEP-003"]
+    }
+  ],
+  "policy_questions": [
+    {
+      "question": "What is the per-meal dinner cap for solo business travel?",
+      "should_refuse": false,
+      "expected_doc_ids": ["TEP-002"]
+    },
+    {
+      "question": "Is alcohol reimbursable on solo travel?",
+      "should_refuse": false,
+      "expected_doc_ids": ["TEP-003"]
+    },
+    {
+      "question": "What is the weather forecast for Seattle tomorrow?",
+      "should_refuse": true
+    }
+  ]
+}

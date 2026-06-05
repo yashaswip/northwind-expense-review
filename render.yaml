@@ -1,0 +1,20 @@
+# Render Blueprint — connect repo and deploy in one click
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: northwind-expense
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: POLICIES_DIR
+        value: ../data/policies
+      - key: SUBMISSIONS_SEED_DIR
+        value: ../data/submissions
+    disk:
+      name: northwind-data
+      mountPath: /app/backend
+      sizeGB: 1

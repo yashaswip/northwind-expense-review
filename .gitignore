@@ -1,0 +1,14 @@
+.env
+.venv/
+backend/.venv/
+__pycache__/
+/policies/
+/submissions/
+*.pyc
+backend/northwind.db
+backend/chroma_data/
+backend/uploads/
+node_modules/
+frontend/dist/
+.DS_Store
+*.egg-info/
