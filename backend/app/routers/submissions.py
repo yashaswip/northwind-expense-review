@@ -257,32 +257,41 @@ def run_review(submission_id: int, db: Session = Depends(get_db)):
         "trip_dates": sub.trip_dates,
     }
 
-    for rec in sub.receipts:
-        path = Path(rec.stored_path)
-        extracted, text = receipt_parser.parse(path, rec.mime_type)
-        rec.extracted_text = text
+    try:
+        for rec in sub.receipts:
+            path = Path(rec.stored_path)
+            if not path.exists():
+                raise HTTPException(400, f"Receipt file missing: {rec.filename}")
+            extracted, text = receipt_parser.parse(path, rec.mime_type)
+            rec.extracted_text = text
 
-        review = expense_reviewer.review_line(text, extracted, ctx)
-        if rec.line_item:
-            db.delete(rec.line_item)
-            db.flush()
+            review = expense_reviewer.review_line(text, extracted, ctx)
+            if rec.line_item:
+                db.delete(rec.line_item)
+                db.flush()
 
-        item = LineItem(
-            receipt_id=rec.id,
-            category=extracted.category,
-            vendor=extracted.vendor,
-            expense_date=extracted.expense_date,
-            amount=extracted.amount,
-            currency=extracted.currency or "USD",
-            description=extracted.description or extracted.raw_summary,
-            verdict=review.verdict,
-            confidence=review.confidence,
-            reasoning=review.reasoning,
-            policy_citations=json.dumps(
-                [c.model_dump() for c in review.policy_citations]
-            ),
-        )
-        db.add(item)
+            item = LineItem(
+                receipt_id=rec.id,
+                category=extracted.category,
+                vendor=extracted.vendor,
+                expense_date=extracted.expense_date,
+                amount=extracted.amount,
+                currency=extracted.currency or "USD",
+                description=extracted.description or extracted.raw_summary,
+                verdict=review.verdict,
+                confidence=review.confidence,
+                reasoning=review.reasoning,
+                policy_citations=json.dumps(
+                    [c.model_dump() for c in review.policy_citations]
+                ),
+            )
+            db.add(item)
+    except HTTPException:
+        raise
+    except Exception as e:
+        sub.status = SubmissionStatus.error
+        db.commit()
+        raise HTTPException(500, f"Review failed: {e}") from e
 
     sub.status = SubmissionStatus.reviewed
     sub.updated_at = datetime.utcnow()

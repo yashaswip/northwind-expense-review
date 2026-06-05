@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     policies_dir: str = "../data/policies"
     submissions_seed_dir: str = "../data/submissions"
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
-    min_retrieval_score: float = 0.35
+    min_retrieval_score: float = 0.28
     top_k_policies: int = 8
 
     @property

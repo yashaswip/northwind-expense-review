@@ -25,22 +25,28 @@ def _extract_doc_id(text: str, filename: str) -> str:
 
 
 def _chunk_text(text: str, doc_id: str, source_file: str) -> list[dict]:
-    """Split policy text into section-aware chunks."""
-    paragraphs = [p.strip() for p in re.split(r"\n{2,}", text) if p.strip()]
+    """Split policy text into section-aware chunks (PDFs use single newlines)."""
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    if not lines:
+        return []
+
     chunks: list[dict] = []
     current_section = "1"
     buffer: list[str] = []
+    buf_len = 0
+    chunk_idx = 0
 
     def flush():
-        nonlocal buffer
+        nonlocal buffer, buf_len, chunk_idx
         if not buffer:
             return
         body = "\n".join(buffer)
         if len(body) < 40:
             buffer = []
+            buf_len = 0
             return
         chunk_id = hashlib.sha256(
-            f"{doc_id}:{current_section}:{body[:120]}".encode()
+            f"{doc_id}:{current_section}:{chunk_idx}:{body[:120]}".encode()
         ).hexdigest()[:16]
         chunks.append(
             {
@@ -51,29 +57,21 @@ def _chunk_text(text: str, doc_id: str, source_file: str) -> list[dict]:
                 "source_file": source_file,
             }
         )
+        chunk_idx += 1
         buffer = []
+        buf_len = 0
 
-    for para in paragraphs:
-        sec = SECTION_RE.match(para)
-        if sec and len(para) < 120:
+    for line in lines:
+        sec = re.match(r"^(\d+(?:\.\d+)*)\.\s", line)
+        if sec and buf_len > 400:
             flush()
             current_section = sec.group(1)
-        buffer.append(para)
-        joined = "\n".join(buffer)
-        if len(joined) > 1800:
+        buffer.append(line)
+        buf_len += len(line) + 1
+        if buf_len >= 1400:
             flush()
-    flush()
 
-    if not chunks and text.strip():
-        chunks.append(
-            {
-                "id": hashlib.sha256(text[:200].encode()).hexdigest()[:16],
-                "text": text[:4000],
-                "doc_id": doc_id,
-                "section": "1",
-                "source_file": source_file,
-            }
-        )
+    flush()
     return chunks
 
 

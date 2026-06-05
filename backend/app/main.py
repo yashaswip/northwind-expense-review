@@ -20,7 +20,13 @@ async def lifespan(_: FastAPI):
     finally:
         db.close()
     try:
-        policy_index.ensure_indexed()
+        count = policy_index.ensure_indexed()
+        # Re-index if stale index has too few chunks (old broken chunker)
+        if count < 50:
+            policies_dir = settings.resolve_path(settings.policies_dir)
+            if policies_dir.exists():
+                count = policy_index.ingest_directory(policies_dir)
+        print(f"Policy index ready: {count} chunks")
     except Exception as e:
         print(f"Policy indexing deferred: {e}")
     yield
