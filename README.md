@@ -1,12 +1,10 @@
 # Northwind Logistics — AI Expense Pre-Review
 
-**Live demo:** _Add your deployed URL here after Render/Railway deploy_
-
+**Live demo:** https://northwind-expense-review-ha8n.onrender.com
 **Repo:** https://github.com/yashaswip/northwind-expense-review
 
 Finance reviewers use this app to upload trip receipts, run an AI-assisted pre-review against company policies, override verdicts with an audit trail, browse submission history, and ask grounded policy questions.
 
-> **Same-day submit?** Follow [SUBMIT_TODAY.md](./SUBMIT_TODAY.md) step-by-step.
 
 ## Quick start (local)
 
