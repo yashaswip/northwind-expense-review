@@ -39,7 +39,7 @@ REVIEW_SCHEMA = {
                     "section": {"type": ["string", "null"]},
                     "quote": {"type": "string"},
                 },
-                "required": ["document_id", "quote"],
+                "required": ["document_id", "section", "quote"],
                 "additionalProperties": False,
             },
         },

@@ -158,19 +158,27 @@ class PolicyIndex:
     def ensure_indexed(self) -> int:
         if self.chunk_count > 0:
             return self.chunk_count
+        if not self._openai:
+            return 0
         policies_dir = settings.resolve_path(settings.policies_dir)
         if not policies_dir.exists():
             return 0
-        return self.ingest_directory(policies_dir)
+        try:
+            return self.ingest_directory(policies_dir)
+        except Exception:
+            return 0
 
     def retrieve(self, query: str, top_k: int | None = None) -> list[dict]:
         k = top_k or settings.top_k_policies
         if self.chunk_count == 0:
             self.ensure_indexed()
-        if self.chunk_count == 0:
+        if self.chunk_count == 0 or not self._openai:
             return []
 
-        q_emb = self._embed([query])[0]
+        try:
+            q_emb = self._embed([query])[0]
+        except Exception:
+            return []
         results = self._collection.query(
             query_embeddings=[q_emb],
             n_results=min(k, self.chunk_count),

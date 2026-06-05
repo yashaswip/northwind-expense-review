@@ -46,7 +46,15 @@ EXTRACTION_SCHEMA = {
         "description": {"type": ["string", "null"]},
         "raw_summary": {"type": ["string", "null"]},
     },
-    "required": ["category", "currency"],
+    "required": [
+        "vendor",
+        "expense_date",
+        "amount",
+        "currency",
+        "category",
+        "description",
+        "raw_summary",
+    ],
     "additionalProperties": False,
 }
 
