@@ -2,7 +2,7 @@
 
 **Live demo:** _Add your deployed URL here after Render/Railway deploy_
 
-**Repo:** _Add your public GitHub URL here_
+**Repo:** https://github.com/yashaswip/northwind-expense-review
 
 Finance reviewers use this app to upload trip receipts, run an AI-assisted pre-review against company policies, override verdicts with an audit trail, browse submission history, and ask grounded policy questions.
 
